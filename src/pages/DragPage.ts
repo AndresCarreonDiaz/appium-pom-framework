@@ -14,7 +14,8 @@ class DragPage extends BasePage {
   /** Drops a piece in its slot and waits until the app takes it off the board. */
   async dragPieceToSlot(id: Piece): Promise<void> {
     const piece = this.piece(id)
-    await piece.dragAndDrop(await this.slot(id))
+    // The default 250 ms drag is faster than a slow emulator's JS thread can follow.
+    await piece.dragAndDrop(await this.slot(id), { duration: 1_000 })
     await piece.waitForExist({ reverse: true, timeoutMsg: `Piece ${id} was not accepted by its slot` })
   }
 
