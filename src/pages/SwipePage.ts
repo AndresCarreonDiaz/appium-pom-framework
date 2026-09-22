@@ -70,14 +70,15 @@ class SwipePage extends BasePage {
     throw new Error(`Hidden message not visible after ${maxSwipes} swipes`)
   }
 
+  /** Starts in whichever free band (above or below the carousel) is taller. */
   private async swipeStartOutsideCarousel(top: number, bottom: number): Promise<number> {
     const margin = 20
     if (!(await this.carousel.isDisplayed())) return bottom - margin
     const carousel = await this.carousel.getLocation()
     const { height } = await this.carousel.getSize()
-    // Prefer the band above the carousel while there is room to swipe from it.
-    if (carousel.y - top > 150) return Math.round(carousel.y - margin)
-    return Math.round(Math.min(carousel.y + height + margin, bottom - margin))
+    const spaceAbove = carousel.y - top
+    const spaceBelow = bottom - (carousel.y + height)
+    return Math.round(spaceBelow >= spaceAbove ? bottom - margin : carousel.y - margin)
   }
 
   async isHiddenMessageDisplayed(): Promise<boolean> {
